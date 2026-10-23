@@ -43,20 +43,37 @@ Higher contamination catches the same attacks but flags many more normal
 logins — in a real product that means annoying innocent users with
 challenges and alerts.
 
+## Strict held-out evaluation (the honest numbers)
+
+The table above is *in-sample*: the detectors were evaluated on data that
+included their own training logins, which flatters them. The strict
+version (`run_experiment_strict()`) splits the 200 normal logins 70/30
+**before** fitting — 140 train, 60 held out — and evaluates only on the
+held-out 60 normals plus all 30 anomalies (anomalies are never trained on):
+
+| Detector | Accuracy | Anomalies caught | False alarms |
+|----------|----------|------------------|--------------|
+| Statistical (z-score) | **100%** | 30 / 30 | 0 |
+| Isolation Forest (contamination 0.02) | 98.9% | 30 / 30 | 1 |
+
+On held-out data the gap disappears — both detectors catch every attack,
+and the simple statistical detector actually edges ahead with zero false
+alarms. The in-sample "Forest wins" result was partly an artefact of the
+evaluation method, which is exactly why held-out evaluation matters.
+
 ## Conclusion
-On this synthetic data, a tuned Isolation Forest is the stronger detector:
-it missed **no** attacks, at the cost of 2 false alarms, while the
-statistical detector never false-alarms but misses 4 attacks. For account
-security, missing an attack is usually worse than an extra verification
-challenge — so the Forest is the better default *when scikit-learn is
-available*, and the statistical detector remains a solid zero-dependency
-fallback.
+On this synthetic data both detectors are strong. In-sample, a tuned
+Isolation Forest looks better (no missed attacks, 2 false alarms vs the
+statistical detector's 4 misses). On a strict held-out split they tie on
+detection and the zero-dependency statistical detector wins on false
+alarms. For account security, missing an attack is usually worse than an
+extra verification challenge — but the honest takeaway is that evaluation
+method changes the ranking, so quote the held-out numbers.
 
 ## Limitations (read before quoting these numbers)
 - The data is **synthetic and simple**; real logins are noisier and
   attackers adapt. These scores will not transfer directly to real traffic.
-- Detectors are evaluated on the full synthetic set, which includes the
-  normal logins they were trained on, so results are optimistic.
-  A strict train/test split is the obvious next step.
+- The in-sample table at the top is optimistic by construction; the
+  strict held-out table above is the one to quote.
 - Features are account-profile relative (usual country/device/hours);
   a production system needs per-account baselines and privacy review.

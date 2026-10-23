@@ -33,3 +33,17 @@ class TestIsolationForest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless(SKLEARN_AVAILABLE, "scikit-learn not installed (see requirements-ml.txt)")
+class TestStrictSplit(unittest.TestCase):
+    def test_strict_split_uses_held_out_test_set(self):
+        from src.isolation_forest_experiment import run_experiment_strict
+        results = run_experiment_strict()
+        split = results["split"]
+        self.assertEqual(split["train_normal"] + split["test_normal"], 200)
+        self.assertEqual(split["test_anomalous"], 30)
+        self.assertEqual(results["isolation_forest"]["total"], split["test_total"])
+        self.assertEqual(results["statistical_detector"]["total"], split["test_total"])
+        # Honest held-out performance should still be strong on this data.
+        self.assertGreater(results["isolation_forest"]["accuracy"], 0.8)

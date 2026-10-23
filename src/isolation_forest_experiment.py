@@ -100,6 +100,11 @@ def run_experiment(seed: int = 42) -> dict:
 
     The statistical detector is included so the experiment reports a fair,
     same-data comparison — not just the Isolation Forest in isolation.
+
+    NOTE: this is an *in-sample* evaluation — the detectors are fitted on
+    every normal record and then evaluated on a set that includes those
+    same records, so the numbers are optimistic. Use
+    :func:`run_experiment_strict` for an honest held-out estimate.
     """
     require_sklearn()
     from .ai_anomaly import StatisticalAnomalyDetector
@@ -116,6 +121,43 @@ def run_experiment(seed: int = 42) -> dict:
                     "seed": seed},
         "statistical_detector": _summarise(statistical, labelled),
         "isolation_forest": _summarise(forest, labelled),
+    }
+
+
+def run_experiment_strict(seed: int = 42, train_fraction: float = 0.7) -> dict:
+    """Strict held-out evaluation.
+
+    Normal logins are split into a training part and a held-out test part
+    *before* fitting. Both detectors are fitted on the training normals
+    only, then evaluated on a test set they have never seen: the held-out
+    normals plus every anomalous login (anomalies are never trained on,
+    matching the detectors' fit-on-normal-only design).
+
+    This is the honest number to quote — it removes the in-sample optimism
+    of :func:`run_experiment`.
+    """
+    require_sklearn()
+    from .ai_anomaly import StatisticalAnomalyDetector
+
+    labelled = generate_synthetic_logins(seed=seed)
+    normal = [r for r, bad in labelled if not bad]
+    anomalous = [(r, bad) for r, bad in labelled if bad]
+
+    cut = int(len(normal) * train_fraction)
+    train_normal = normal[:cut]
+    test_labelled = [(r, False) for r in normal[cut:]] + anomalous
+
+    statistical = StatisticalAnomalyDetector().fit(train_normal)
+    forest = IsolationForestDetector().fit(train_normal)
+    return {
+        "split": {"train_normal": len(train_normal),
+                  "test_total": len(test_labelled),
+                  "test_normal": len(test_labelled) - len(anomalous),
+                  "test_anomalous": len(anomalous),
+                  "train_fraction": train_fraction,
+                  "seed": seed},
+        "statistical_detector": _summarise(statistical, test_labelled),
+        "isolation_forest": _summarise(forest, test_labelled),
     }
 
 

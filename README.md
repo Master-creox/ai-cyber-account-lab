@@ -65,6 +65,7 @@ pytest
 python main.py demo
 python main.py url https://github.com/Master-creox
 python main.py login --country RU --device "Unknown Linux" --hour 2 --failed-attempts 4
+python main.py analyze-csv data/sample_logins.csv
 python main.py dataset --output data/sample_logins.csv
 python main.py password
 ```
@@ -72,13 +73,20 @@ python main.py password
 `demo` runs every check on sample inputs, prints an explainable report, and
 evaluates the AI anomaly model on the synthetic dataset.
 
+`analyze-csv` scores **your own** login export: any CSV with columns
+`country, device, hour, failed_attempts` (an optional `is_anomalous`
+0/1 column adds an accuracy summary). Every row gets a verdict with
+reasons, plus a flagged/total summary.
+
 ## ML experiment: Isolation Forest
 
 `src/isolation_forest_experiment.py` compares scikit-learn's Isolation
 Forest against the built-in statistical detector on the same synthetic
-data and features. With `contamination=0.02` the Forest reached **99.1%
-accuracy and caught 30/30 anomalous logins** (statistical detector: 98.3%,
-26/30, with zero false alarms). Full results, a contamination sensitivity
+data and features. In-sample, the Forest (contamination 0.02) reached
+**99.1% accuracy, 30/30 anomalies** vs the statistical detector's 98.3%.
+On a **strict held-out split** (train on 140 normals, test on 60 unseen
+normals + 30 anomalies) both catch 30/30 — statistical **100%**, Forest
+98.9% with 1 false alarm. Full results, a contamination sensitivity
 sweep, and limitations: [docs/isolation-forest-experiment.md](docs/isolation-forest-experiment.md).
 
 ```bash
@@ -128,6 +136,9 @@ print(result.feedback)
 - [x] Reports that explain *why* a login or link was flagged
 - [x] Web dashboard (local, standard-library only) with form, results, and JSON API
 - [x] Isolation Forest experiment with scikit-learn — see [docs/isolation-forest-experiment.md](docs/isolation-forest-experiment.md)
+- [x] Strict held-out train/test evaluation for honest ML numbers
+- [x] `analyze-csv` — score your own login CSV export with the anomaly model
+- [x] SECURITY.md — scope, data-handling and vulnerability reporting
 
 ## Safety & ethics
 
