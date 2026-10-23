@@ -9,4 +9,5 @@ __all__ = [
     "password_strength",
     "phishing_detector",
     "report",
+    "web_dashboard",
 ]

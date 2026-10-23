@@ -14,6 +14,7 @@ Most account takeovers start with simple weaknesses: reused or weak passwords, p
 - **Login anomaly detection** — rule-based flags for unusual login time, device, or location, plus an **AI anomaly model** trained on synthetic logins (see `src/ai_anomaly.py` and `data/sample_logins.csv`).
 - **Common-password check (privacy-preserving)** — a sample password is SHA-256 hashed in memory and compared only against hashes of very common passwords. It is never stored.
 - **CLI + unified report** — run every check together and get an explainable report (see below).
+- **Web dashboard** — a local dashboard (standard library only, no installs) with a check form, results, and a JSON API (see below).
 - **Phishing risk checks** — heuristic checks for suspicious URLs, such as look-alike domains, IP-address links, and excessive subdomains.
 - **Account safety guidance** — a practical checklist for 2FA, recovery options, and session hygiene.
 
@@ -37,8 +38,10 @@ Most account takeovers start with simple weaknesses: reused or weak passwords, p
 │   ├── login_anomaly.py
 │   ├── password_strength.py
 │   ├── phishing_detector.py
-│   └── report.py                # unified, explainable report
+│   ├── report.py                # unified, explainable report
+│   └── web_dashboard.py         # WSGI dashboard + JSON API
 ├── tests/
+├── dashboard.py                 # web dashboard entry point
 ├── main.py
 ├── requirements.txt
 └── README.md
@@ -69,6 +72,21 @@ python main.py password
 `demo` runs every check on sample inputs, prints an explainable report, and
 evaluates the AI anomaly model on the synthetic dataset.
 
+## Web dashboard
+
+```bash
+python dashboard.py
+# open http://127.0.0.1:8000
+```
+
+- `/` — check form (sample password, URL, login details) with an explainable result
+- `/api/demo` — JSON report + AI model evaluation
+- `/health` — health check
+
+The dashboard runs locally only by default. Sample passwords are assessed in
+memory, never stored or echoed back. Do not expose this demo to the internet
+without adding real authentication, HTTPS, and rate limiting.
+
 Try the password checker in Python:
 
 ```python
@@ -86,7 +104,8 @@ print(result.feedback)
 - [x] Password breach-pattern checks using privacy-preserving (hashed) techniques
 - [x] CLI to run all account checks together
 - [x] Reports that explain *why* a login or link was flagged
-- [ ] Optional: web dashboard, Isolation Forest experiment with scikit-learn
+- [x] Web dashboard (local, standard-library only) with form, results, and JSON API
+- [ ] Optional: Isolation Forest experiment with scikit-learn
 
 ## Safety & ethics
 
