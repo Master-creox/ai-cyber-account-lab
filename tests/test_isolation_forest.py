@@ -45,5 +45,14 @@ class TestStrictSplit(unittest.TestCase):
         self.assertEqual(split["test_anomalous"], 30)
         self.assertEqual(results["isolation_forest"]["total"], split["test_total"])
         self.assertEqual(results["statistical_detector"]["total"], split["test_total"])
-        # Honest held-out performance should still be strong on this data.
-        self.assertGreater(results["isolation_forest"]["accuracy"], 0.8)
+        # Regression-check the verified seed-42 held-out trade-off.
+        statistical = results["statistical_detector"]
+        self.assertEqual(statistical["accuracy"], 0.956)
+        self.assertEqual(statistical["anomalies_detected"], 26)
+        self.assertEqual(statistical["anomalies_missed"], 4)
+        self.assertEqual(statistical["false_alarms"], 0)
+        forest = results["isolation_forest"]
+        self.assertEqual(forest["accuracy"], 0.956)
+        self.assertEqual(forest["anomalies_detected"], 30)
+        self.assertEqual(forest["anomalies_missed"], 0)
+        self.assertEqual(forest["false_alarms"], 4)

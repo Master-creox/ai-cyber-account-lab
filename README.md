@@ -85,9 +85,11 @@ Forest against the built-in statistical detector on the same synthetic
 data and features. In-sample, the Forest (contamination 0.02) reached
 **99.1% accuracy, 30/30 anomalies** vs the statistical detector's 98.3%.
 On a **strict held-out split** (train on 140 normals, test on 60 unseen
-normals + 30 anomalies) both catch 30/30 — statistical **100%**, Forest
-98.9% with 1 false alarm. Full results, a contamination sensitivity
-sweep, and limitations: [docs/isolation-forest-experiment.md](docs/isolation-forest-experiment.md).
+normals + 30 anomalies) both score **95.6% accuracy**, with opposite
+trade-offs: the statistical detector catches 26/30 anomalies with zero
+false alarms, while the Forest catches 30/30 with 4 false alarms. Full
+results, a contamination sensitivity sweep, and limitations:
+[docs/isolation-forest-experiment.md](docs/isolation-forest-experiment.md).
 
 ```bash
 pip install -r requirements-ml.txt

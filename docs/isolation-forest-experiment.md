@@ -53,22 +53,24 @@ held-out 60 normals plus all 30 anomalies (anomalies are never trained on):
 
 | Detector | Accuracy | Anomalies caught | False alarms |
 |----------|----------|------------------|--------------|
-| Statistical (z-score) | **100%** | 30 / 30 | 0 |
-| Isolation Forest (contamination 0.02) | 98.9% | 30 / 30 | 1 |
+| Statistical (z-score) | 95.6% | 26 / 30 | 0 |
+| Isolation Forest (contamination 0.02) | 95.6% | 30 / 30 | 4 |
 
-On held-out data the gap disappears — both detectors catch every attack,
-and the simple statistical detector actually edges ahead with zero false
-alarms. The in-sample "Forest wins" result was partly an artefact of the
-evaluation method, which is exactly why held-out evaluation matters.
+On held-out data the overall accuracy is tied, but the error profile is
+different. The statistical detector is conservative: it misses 4 attacks
+but never false-alarms. The Isolation Forest catches every attack, at the
+cost of 4 false alarms. The held-out split therefore reveals a trade-off
+that the single in-sample accuracy number hides.
 
 ## Conclusion
 On this synthetic data both detectors are strong. In-sample, a tuned
 Isolation Forest looks better (no missed attacks, 2 false alarms vs the
 statistical detector's 4 misses). On a strict held-out split they tie on
-detection and the zero-dependency statistical detector wins on false
-alarms. For account security, missing an attack is usually worse than an
-extra verification challenge — but the honest takeaway is that evaluation
-method changes the ranking, so quote the held-out numbers.
+overall accuracy; the choice depends on the cost of each error type. For
+account security, missing an attack is usually worse than an extra
+verification challenge, while the zero-dependency statistical detector
+offers perfect precision on this split. Quote the held-out numbers and
+the trade-off, not just headline accuracy.
 
 ## Limitations (read before quoting these numbers)
 - The data is **synthetic and simple**; real logins are noisier and
