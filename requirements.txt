@@ -1,0 +1,6 @@
+# Core code uses only the Python standard library.
+# Development / testing:
+pytest>=8.0
+# Roadmap (AI anomaly detection) — install when that module is built:
+# scikit-learn>=1.4
+# pandas>=2.0
