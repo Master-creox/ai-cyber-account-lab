@@ -2,7 +2,11 @@
 
 __all__ = [
     "account_safety",
+    "ai_anomaly",
+    "breach_pattern",
+    "cli",
     "login_anomaly",
     "password_strength",
     "phishing_detector",
+    "report",
 ]

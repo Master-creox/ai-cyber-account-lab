@@ -11,7 +11,9 @@ Most account takeovers start with simple weaknesses: reused or weak passwords, p
 ## Features (starter)
 
 - **Password strength analysis** — length, character variety, and common-pattern checks with clear feedback. Passwords are assessed locally and never stored.
-- **Login anomaly detection** — flags unusual login time, device, or location compared with a simple baseline. Roadmap: train an anomaly model (e.g. Isolation Forest) on synthetic login data.
+- **Login anomaly detection** — rule-based flags for unusual login time, device, or location, plus an **AI anomaly model** trained on synthetic logins (see `src/ai_anomaly.py` and `data/sample_logins.csv`).
+- **Common-password check (privacy-preserving)** — a sample password is SHA-256 hashed in memory and compared only against hashes of very common passwords. It is never stored.
+- **CLI + unified report** — run every check together and get an explainable report (see below).
 - **Phishing risk checks** — heuristic checks for suspicious URLs, such as look-alike domains, IP-address links, and excessive subdomains.
 - **Account safety guidance** — a practical checklist for 2FA, recovery options, and session hygiene.
 
@@ -19,18 +21,25 @@ Most account takeovers start with simple weaknesses: reused or weak passwords, p
 
 ```
 .
+├── data/
+│   └── sample_logins.csv        # synthetic dataset (no real user data)
 ├── docs/
 │   ├── account-security-checklist.md
 │   └── threat-model.md
+├── scripts/
+│   └── generate_dataset.py
 ├── src/
 │   ├── __init__.py
 │   ├── account_safety.py
+│   ├── ai_anomaly.py            # AI anomaly model + synthetic data generator
+│   ├── breach_pattern.py        # hashed common-password check
+│   ├── cli.py
 │   ├── login_anomaly.py
 │   ├── password_strength.py
-│   └── phishing_detector.py
+│   ├── phishing_detector.py
+│   └── report.py                # unified, explainable report
 ├── tests/
-│   ├── test_password_strength.py
-│   └── test_phishing_detector.py
+├── main.py
 ├── requirements.txt
 └── README.md
 ```
@@ -47,7 +56,20 @@ pip install -r requirements.txt
 pytest
 ```
 
-Try the password checker:
+## Run the lab (CLI)
+
+```bash
+python main.py demo
+python main.py url https://github.com/Master-creox
+python main.py login --country RU --device "Unknown Linux" --hour 2 --failed-attempts 4
+python main.py dataset --output data/sample_logins.csv
+python main.py password
+```
+
+`demo` runs every check on sample inputs, prints an explainable report, and
+evaluates the AI anomaly model on the synthetic dataset.
+
+Try the password checker in Python:
 
 ```python
 from src.password_strength import assess_password
@@ -60,10 +82,11 @@ print(result.feedback)
 ## Roadmap
 
 - [x] Starter structure, password strength, phishing heuristics, login-risk rules
-- [ ] Synthetic login dataset + AI anomaly-detection model
-- [ ] Password breach-pattern checks using privacy-preserving (hashed) techniques
-- [ ] Simple dashboard / CLI to run all account checks together
-- [ ] Reports that explain *why* a login or link was flagged
+- [x] Synthetic login dataset + AI anomaly-detection model
+- [x] Password breach-pattern checks using privacy-preserving (hashed) techniques
+- [x] CLI to run all account checks together
+- [x] Reports that explain *why* a login or link was flagged
+- [ ] Optional: web dashboard, Isolation Forest experiment with scikit-learn
 
 ## Safety & ethics
 
