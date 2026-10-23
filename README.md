@@ -72,6 +72,20 @@ python main.py password
 `demo` runs every check on sample inputs, prints an explainable report, and
 evaluates the AI anomaly model on the synthetic dataset.
 
+## ML experiment: Isolation Forest
+
+`src/isolation_forest_experiment.py` compares scikit-learn's Isolation
+Forest against the built-in statistical detector on the same synthetic
+data and features. With `contamination=0.02` the Forest reached **99.1%
+accuracy and caught 30/30 anomalous logins** (statistical detector: 98.3%,
+26/30, with zero false alarms). Full results, a contamination sensitivity
+sweep, and limitations: [docs/isolation-forest-experiment.md](docs/isolation-forest-experiment.md).
+
+```bash
+pip install -r requirements-ml.txt
+python scripts/run_isolation_forest.py
+```
+
 ## Web dashboard
 
 ```bash
@@ -113,7 +127,7 @@ print(result.feedback)
 - [x] CLI to run all account checks together
 - [x] Reports that explain *why* a login or link was flagged
 - [x] Web dashboard (local, standard-library only) with form, results, and JSON API
-- [ ] Optional: Isolation Forest experiment with scikit-learn
+- [x] Isolation Forest experiment with scikit-learn — see [docs/isolation-forest-experiment.md](docs/isolation-forest-experiment.md)
 
 ## Safety & ethics
 

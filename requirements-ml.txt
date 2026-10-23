@@ -1,0 +1,3 @@
+# Optional ML experiment dependencies (the core lab needs none of these).
+scikit-learn>=1.4
+# pandas>=2.0  # optional, for dataset exploration notebooks

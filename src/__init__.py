@@ -5,6 +5,7 @@ __all__ = [
     "ai_anomaly",
     "breach_pattern",
     "cli",
+    "isolation_forest_experiment",
     "login_anomaly",
     "password_strength",
     "phishing_detector",
