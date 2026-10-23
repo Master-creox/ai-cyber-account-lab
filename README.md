@@ -83,6 +83,14 @@ python dashboard.py
 - `/api/demo` — JSON report + AI model evaluation
 - `/health` — health check
 
+### Dashboard previews
+
+Rendered previews of the dashboard (home and a sample HIGH RISK result):
+
+![Dashboard home](docs/images/dashboard-home.svg)
+
+![Dashboard HIGH RISK result](docs/images/dashboard-result.svg)
+
 The dashboard runs locally only by default. Sample passwords are assessed in
 memory, never stored or echoed back. Do not expose this demo to the internet
 without adding real authentication, HTTPS, and rate limiting.
